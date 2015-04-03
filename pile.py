@@ -6,7 +6,7 @@ class Pile:
         self.tour=[] #La pile du tour
         self.defausse=[] #L'ensemble des cartes jouées (pour navet'
         self.cueilleCerise=[]
-        self.tour_en_cours='' #Defini le type de tour en cours (paire, triple, simple, atour, etc) A definir
+        self.tour_en_cours='' #Le coup qui viens d'etre joué - contient les dernieres cartes joué et le type de coup -
         self.etat_jeu=[]      #Defini l'etat du jeu -> pattes de canard, revo, royalisme, etc. A definir
     
     def get_force_tour_en_cours(self):

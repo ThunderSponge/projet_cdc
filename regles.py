@@ -1,11 +1,14 @@
 # -*- coding: iso-8859-15 -*-
 
+
+from textwrap import wrap
+
 #Definition des regles du cul de chouettes
 
 #Ho god why?
 
 recouvrement={
-'':[],
+'':[''],
 'nsimple':['nsimple','bout'],
 'ndouble':['ndouble','bout'],
 'ntriple':['ntriple','bout'],
@@ -14,8 +17,67 @@ recouvrement={
 'adouble': ['adouble','bout'],
 'atriple': ['atriple','bout'],
 'bout': ['cdc'],
-'cdc':[]
+'Excuse': ['cdcb'],
+'cdc':[],
+'cdcb':['49']
+
 }
+
+coup_triple={
+
+
+}
+
+coup_quadruple={
+'royalisme':['11','12','13','14'],
+'pmc':['7','8','8','10']
+
+}
+# Donne la liste des permutations possibles pour un mot donné
+# Le mot est la liste des lettres !
+# ex: ['1','2','3'] -> [  ['2','1','3'], .. '312', '231', '132', '123', '321']
+def permutations(lettres):
+    x,n=0,[]
+
+    for t in lettres:
+        n.append(lettres.count(t))
+    
+    trav=lettres
+    
+    while x<=len(lettres)-2: #nbre de lettres du mot
+        sol=[]
+        for i in range(0,len(lettres),1):
+            for li in trav:
+                p=li+lettres[i]
+                pu=p.count(lettres[i])
+                if pu<=n[i]:
+                    sol.append(li+lettres[i])
+        trav=list(set(sol))
+        x+=1
+        
+    ret=[]
+    for l in sol:
+        ret.append(wrap(l,1))
+    return ret
+
+    
+def seSuivent(liste):
+    ####
+    # Fonction qui determine si les valeurs de carte se suivent
+    ####
+    nl=[]
+    for c in liste:
+        nl.append(c.get_real_valeur())
+    nl.sort()
+    pred=-1
+    for v in nl:
+        if pred==-1 or v==pred+1:
+            pred=v
+            pass
+        else:
+            return False
+    return True
+
 
 class Regles:
     pass
@@ -40,9 +102,10 @@ class Coup:
         #########################################################################
         # Version 0.1 coups autorisés:
         #
-        #    - Normal simple, double, triple, carré + nuts (AAAn et AAnN ok mais pas AAAAn)
+        #    - Normal simple, double, triple, carré // Pas de nuts !
         #    - 1,2,3 atouts de suite
         #    - Bout sur n'importe quoi et cul de chouette (sans echange post partie)
+        #    - Cul de chouette banjo et contre cul de chouette banjo (sans echange post partie)
         #
         #########################################################################
         if not self.estUnCoup():
@@ -51,8 +114,9 @@ class Coup:
             return False
         if not self.estPlusFort(pile):
             return False
-                
-        pile.set_tour_en_cours(self)
+        
+        if (self.cartes[0].get_valeur() != 'VENDU'):
+            pile.set_tour_en_cours(self)
         return True
     
     def estUnCoup(self):
@@ -62,24 +126,174 @@ class Coup:
         
         # Dans cette fonction on determine également la force d'un coup
         # C'est un peu fat mama fonction quoi
-        
+
+        ###########################################################################
+        #
+        # Cas des coups à une carte
+        #
+        ###########################################################################
+        if (len(self.cartes)==1):
+            return self.coupMono()
+        elif (len(self.cartes)==2):
+            return self.coupDouble()
+        elif (len(self.cartes)==3):
+            return self.coupTriple()
+        elif (len(self.cartes)==4):
+            return self.coupQuadruple()
  
-        return True
+        print("Ce coup n'existe pas ou n'est pas encore implemente")
+        
+        return False
     
     def estCorrect(self,pile):
         # Verifie que le coup est compatible avec ce qui est au centre
+        if self.type=='VENDU':
+            return True
         if pile.get_tour_en_cours()=='' or self.type in recouvrement[pile.get_type_tour_en_cours()]:
             return True
-        return False
         
-        pass
+        print("On ne peux pas jouer un {} sur un {}".format(self.type,pile.get_type_tour_en_cours()))
+        return False
     
     def estPlusFort(self,pile):
         # Verifie que le coup est plus fort que ce qui est au centre
+        if self.type=='VENDU':
+            return True
         if pile.get_tour_en_cours()=='' or self.force >= pile.get_force_tour_en_cours():
+            return True
+        
+        print("Votre coup (force: {}) est trop faible par rapport à celui sur la pile (force: {})".format(self.force,pile.get_force_tour_en_cours()))
+        return False
+    
+    
+########################################################################################################################################################
+#
+#   
+    ###########################################################################
+    #
+    # Determination du type et de la force d'un coup reparti par nombre de carte dans le coup
+    #
+    ###########################################################################
+    
+    # Les coups contenant une seule carte
+    def coupMono(self):
+        if (self.cartes[0].get_valeur() == 'VENDU'):
+            self.type='VENDU'
+            return True
+        else:
+            if self.cartes[0].is_bout():
+                if self.cartes[0].get_valeur()=='E':
+                    self.type='Excuse'
+                else:
+                    self.type='bout'
+                self.force=99
+            elif self.cartes[0].is_normale():
+                self.type='nsimple'
+                self.force=self.cartes[0].get_real_valeur()
+            elif self.cartes[0].is_atout():
+                self.type='asimple'
+                self.force=self.cartes[0].get_real_valeur()
             return True
         return False
     
+    # Les coups contenant deux cartes
+    def coupDouble(self):
+        
+        c1=self.cartes[0]
+        c2=self.cartes[1]
+        
+        # Le cul de chouette
+        if c1.is_bout():
+            if c2.is_bout():
+                # On verra plus tard pour les culs de chouette avec des pates de canard
+                if 'E' not in (c1.get_valeur(),c2.get_valeur()):
+                    self.type='cdcb'
+                else:
+                    self.type='cdc'
+                self.force=99
+                return True
+            # Tout autre coup contenant un bout est forcement incorrect
+            return False
+        
+        if c1.is_normale():
+            if c2.is_normale():
+                # Double
+                print("DEBUG - coup double")
+                if c1.get_real_valeur() == c2.get_real_valeur():
+                    self.type='ndouble'
+                    self.force=c1.get_real_valeur()
+                    return True
+                else:
+                    return False
+            else:
+                # Verifier que c'est un coup du pervers donc
+                return False
+        
+        if c1.is_atout(): # Normalement c'est le cas hein, mais bon....
+            if c2.is_atout():
+                if seSuivent(self.cartes):
+                # Deux atouts à la suite
+                    self.type='adouble'
+                    self.force=max(c1.get_real_valeur(),c2.get_real_valeur())
+                    return True
+                elif (c1.get_valeur(),c2.get_valeur()) in [('4','9'),('9','4')]:
+                # Contre cul de chouette banjo
+                    self.type='49'
+                    self.force=99
+                    return True
+            else:
+                # Verifier que c'est un coup du pervers donc
+                return False
+        
+        return False
+    
+    # Les coups contenant trois cartes
+    def coupTriple(self):
+        c1=self.cartes[0]
+        c2=self.cartes[1]
+        c3=self.cartes[2]
+        
+        if c1.is_bout() or c2.is_bout() or c3.is_bout():
+            return False
+        
+        if c1.is_normale() and c2.is_normale() and c3.is_normale():
+            if c1.get_real_valeur() == c2.get_real_valeur() and c1.get_real_valeur() == c3.get_real_valeur():
+                self.type='ntriple'
+                self.force=c1.get_real_valeur()
+                return True
+        if c1.is_atout() and c2.is_atout() and c3.is_atout():
+            if seSuivent(self.cartes):
+                self.type='atriple'
+                self.force=max(c1.get_real_valeur(),c2.get_real_valeur(),c3.get_real_valeur())
+                return True
+            
+        return False
+    
+    # Les coups contenant quatre cartes
+    def coupQuadruple(self):
+        c1=self.cartes[0]
+        c2=self.cartes[1]
+        c3=self.cartes[2]
+        c4=self.cartes[2]
+        
+        if c1.is_normale() and c2.is_normale() and c3.is_normale() and c4.is_normale():
+            if c1.get_real_valeur() == c2.get_real_valeur() and c1.get_real_valeur() == c3.get_real_valeur() and c1.get_real_valeur() == c4.get_real_valeur():
+                self.type='nquad'
+                self.force=c1.get_real_valeur()
+                return True
+            
+        return False
+
+#   
+#    
+########################################################################################################################################################
+    
+    
+    ###########################################################################
+    #
+    # Accesseurs et divers
+    #
+    ###########################################################################
     
     def get_force(self):
         return self.force

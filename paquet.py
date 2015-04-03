@@ -24,8 +24,8 @@ class Paquet:
                 while i <= NB_NORMALES:
                     self.pioche.append(Carte(i,c,False))
                     i+=1
-        self.pioche.append(Carte('n','nuts',False))
-        self.pioche.append(Carte('N','nuts',False))
+#         self.pioche.append(Carte('n','nuts',False))
+#         self.pioche.append(Carte('N','nuts',False))
         self.pioche.append(Carte('E','excuse',True))
         
         # Le conteneur de toutes les cartes

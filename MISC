@@ -1,11 +1,11 @@
 TODO LIST
 
 --> Un joueur ne peut pas vendre lors du premier coup
-	->> Actuellement c'est possible
 	->> Corrigé
-	
+
 --> Un joueur qui fini n'est vendu qu'au tour suivant --> Question de reprise de main en fin de tour
 	->> Actuellement, Michou Sabine Théo en jeu
 	->> Michou fini; Sabine vend => Théo prend la main alors que normalement, on devrait avoir Théo prend la main ssi il joue une carte.
 	->> Idée: mettre michou à vendu automatique au tour suivant mais à ingame = False
 	
+--> Un joueur peut jouer deux fois la même carte (genre paire de 7c) --> ce qui fait planter le jeu d'ailleurs

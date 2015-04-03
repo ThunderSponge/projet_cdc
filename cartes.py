@@ -1,6 +1,6 @@
 # -*- coding: iso-8859-15 -*-
 
-COULEUR=['pique']#,'coeur','carreau','trefle','atout']
+COULEUR=['pique','coeur','carreau','trefle','atout']
 VALEUR=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','N','n','E'] #Nuts, Excuse
 NB_ATOUTS=21
 NB_NORMALES=14
@@ -21,9 +21,33 @@ class Carte:
             
     def set_isBout(self,isBout):
         self.isBout=isBout
+    
+    def is_bout(self):
+        return self.isBout
         
     def get_valeur(self):
-        return self.valeur    
+        return self.valeur
+    
+    def get_real_valeur(self):
+        if self.valeur=='1' and self.couleur != 'atout':
+            return 15
+        if self.valeur=='2' and self.couleur != 'atout':
+            return 16
+        
+        if self.valeur=='1' or self.valeur=='21' or self.valeur=='E':
+            return 99
+        
+        if self.valeur=='n' or self.valeur=='N':
+            # Actuellement, tous les nuts sont des valets
+            return 11
+        
+        return int(self.valeur)
+        
+    def is_normale(self):
+        return self.couleur in ['pique','coeur','carreau','trefle','nuts']
+    
+    def is_atout(self):
+        return self.couleur in ['atout']
             
     def get_couleur(self):
         return self.couleur
