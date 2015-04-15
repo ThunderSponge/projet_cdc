@@ -10,18 +10,23 @@ class Image:
 		self.z = 0
 		self.width = 0
 		self.height = 0
-		self.setPositions()
+		self.setSize()
 		self.clickable = True
 		self.rotation = 0 
 
-	def setPositions(self):
+	def setSize(self):
 		self.width = self.sprite.get_width()
 		self.height = self.sprite.get_height()
+
+	def setPosition(self,x,y,z):
+		self.x=x
+		self.y=y
+		self.z=z
 
 	def applyRotation(self,angle):
 		self.rotation += angle
 		self.sprite = pygame.transform.rotate(self.spriteOrigin,self.rotation).convert_alpha()
-		self.setPositions()
+		self.setSize()
 
 	def eventClickInImage(self,event):
 		if (not self.clickable):
@@ -42,11 +47,16 @@ class Image:
 	def draw(self,fenetre):
 		fenetre.blit(self.sprite,(self.x,self.y))
 
+class Carte(Image):
+	def __init__(self,hauteur,couleur):
+		Image.__init__(self,"cartes/"+str(hauteur)+str(couleur)+".jpg")
+		self.valeur = hauteur
+		self.couleur = couleur
 
-
-def redraw(images,fenetre):
+def redraw(images,main,fenetre):
 	for img in sorted(images, key=lambda image: image.z,reverse=False):
 		img.draw(fenetre)
+	displayHand(main,fenetre)
 	pygame.display.flip()
 
 def getImage(event,imagesList):
@@ -56,6 +66,25 @@ def getImage(event,imagesList):
 			image_click = img
 	return image_click
 
+def getListeCartes():
+	liste_cartes = list()
+	for valeur in ("as","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","valet","cavalier","dame","roi"):
+		for couleur in ("coeur","pique","carreau","trefle"):
+			liste_cartes.append(Carte(valeur,couleur))
+	return liste_cartes
+
+
+def displayHand(jeu,fenetre):
+	xStart = 400
+	yStart = 600
+	zStart = 1
+	for cartes in jeu:
+		cartes.setPosition(xStart,yStart,xStart)
+		cartes.draw(fenetre)
+		xStart+=30
+		zStart+=1
+
+
 pygame.init()
 list_image = list()
 
@@ -64,15 +93,23 @@ background = Image("table.png")
 background.clickable = False
 list_image.append(background)
 
-cartes = Image("TONSOFCARDS.jpg")
-list_image.append(cartes)
-cartes2 = Image("TONSOFCARDS.jpg")
-cartes2.x=200
-cartes2.z=1
-cartes2.applyRotation(10)
-list_image.append(cartes2)
+#cartes = Image("TONSOFCARDS.jpg")
+#list_image.append(cartes)
+#cartes2 = Image("TONSOFCARDS.jpg")
+#cartes2.x=200
+#cartes2.z=1
+#cartes2.applyRotation(10)
+#list_image.append(cartes2)
 
-redraw(list_image,fenetre)
+cartes = getListeCartes()
+main = list()
+for i in (1,5,15,47,28,35):
+	main.append(cartes[i])
+
+
+
+
+redraw(list_image,main,fenetre)
 continuer = True
 while continuer:
 	for event in pygame.event.get():
@@ -83,6 +120,5 @@ while continuer:
 			if (imgclic is not None) :
 				imgclic.setOnTop(list_image)
 		
-
-		redraw(list_image,fenetre)	
+		redraw(list_image,main,fenetre)	
 		
