@@ -20,8 +20,9 @@ recouvrement={
 'Excuse': ['cdcb'],
 'cdc':[],
 'cdcb':['49'],
-'69':['69','c69','bout']
-'c69':['69','c69','bout'] #contre coup du pervers -> c'est plus facile
+'69':['69','c69','bout'],
+'c69':['69','c69','bout'], #contre coup du pervers -> c'est plus facile
+'passesirop':['passesirop','bout']
 }
 
 coup_double={
@@ -69,6 +70,7 @@ def permutations(lettres):
 def seSuivent(liste):
     ####
     # Fonction qui determine si les valeurs de carte se suivent
+	# /!!\ Attention, pour le moment ordre strict du 3 -> 4 ... -> As -> 2, pas de boucles
     ####
     nl=[]
     for c in liste:
@@ -145,6 +147,8 @@ class Coup:
             return self.coupTriple()
         elif (len(self.cartes)==4):
             return self.coupQuadruple()
+		elif (len(self.cartes)==7):
+			return self.coupSeptuple()
  
         print("Ce coup n'existe pas ou n'est pas encore implemente")
         
@@ -280,7 +284,7 @@ class Coup:
         c1=self.cartes[0]
         c2=self.cartes[1]
         c3=self.cartes[2]
-        c4=self.cartes[2]
+        c4=self.cartes[3]
         
         if c1.is_normale() and c2.is_normale() and c3.is_normale() and c4.is_normale():
             if c1.get_real_valeur() == c2.get_real_valeur() and c1.get_real_valeur() == c3.get_real_valeur() and c1.get_real_valeur() == c4.get_real_valeur():
@@ -289,6 +293,48 @@ class Coup:
                 return True
             
         return False
+	
+	def coupQuintuple(self):
+        c1=self.cartes[0]
+        c2=self.cartes[1]
+        c3=self.cartes[2]
+        c4=self.cartes[3]
+        c5=self.cartes[4]
+		return False
+	
+	def coupSextuple(self):
+        c1=self.cartes[0]
+        c2=self.cartes[1]
+        c3=self.cartes[2]
+        c4=self.cartes[3]
+        c5=self.cartes[4]
+        c6=self.cartes[5]
+		return False
+	
+	# Les coups spéciaux à sept cartes
+	def coupSeptuple(self):
+		# Le passe sirop
+        c1=self.cartes[0]
+        c2=self.cartes[1]
+        c3=self.cartes[2]
+        c4=self.cartes[3]
+        c5=self.cartes[4]
+        c6=self.cartes[5]
+        c7=self.cartes[6]
+		
+		psirop=True
+		for c in c1,c2,c3,c4,c5,c6,c7:
+			psirop=psirop and c.is_normale()
+		if psirop and seSuivent([c1,c2,c3,c4,c5,c6,c7]):
+			self.type='passesirop'
+			self.force=99
+			for c in c1,c2,c3,c4,c5,c6,c7:
+				self.force=min(self.force,c.get_real_valeur()) # point de regle: la force d'un passe sirop est celle de sa plus petite carte
+			return True
+		
+		# Reste à verifier 
+		
+		return False
 
 #   
 #    

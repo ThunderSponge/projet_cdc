@@ -9,3 +9,9 @@ TODO LIST
 	->> Idée: mettre michou à vendu automatique au tour suivant mais à ingame = False
 	
 --> Un joueur peut jouer deux fois la même carte (genre paire de 7c) --> ce qui fait planter le jeu d'ailleurs
+
+--> Comment on fait pour les coups qui bouclent? La fonction seSuivent qui determine si les cartes se suivent prennent pas ça en compte
+	--> Faire un if dégueu ssi les cartes sont normales... et encore... liste type: [3,4,5,6,14,15,16] --> passe sirop as roi deux trois quatre cinq six
+		--> D'ailleurs j'en profite pour souligner le leger problème qu'on va avoir avec le sloubi pour les valeurs et pour les recouvrements
+			mais bon... none of my business
+		--> Quand t'en sera là, tu regardera aussi, pour le 1 et 21 leur real_valeur c'est 99.... c'est un peu con non? (bises)
