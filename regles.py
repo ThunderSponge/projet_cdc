@@ -19,8 +19,13 @@ recouvrement={
 'bout': ['cdc'],
 'Excuse': ['cdcb'],
 'cdc':[],
-'cdcb':['49']
+'cdcb':['49'],
+'69':['69','c69','bout']
+'c69':['69','c69','bout'] #contre coup du pervers -> c'est plus facile
+}
 
+coup_double={
+'69':['6','9']
 }
 
 coup_triple={
@@ -223,11 +228,6 @@ class Coup:
                     self.type='ndouble'
                     self.force=c1.get_real_valeur()
                     return True
-                else:
-                    return False
-            else:
-                # Verifier que c'est un coup du pervers donc
-                return False
         
         if c1.is_atout(): # Normalement c'est le cas hein, mais bon....
             if c2.is_atout():
@@ -236,15 +236,21 @@ class Coup:
                     self.type='adouble'
                     self.force=max(c1.get_real_valeur(),c2.get_real_valeur())
                     return True
-                elif (c1.get_valeur(),c2.get_valeur()) in [('4','9'),('9','4')]:
+                elif (c1.get_valeur(),c2.get_valeur()) in permutation('4','9'):
                 # Contre cul de chouette banjo
                     self.type='49'
                     self.force=99
                     return True
-            else:
-                # Verifier que c'est un coup du pervers donc
-                return False
-        
+					
+		# Coup du pervers
+		if [c1.get_valeur(),c2.get_valeur()] in permutation(['6','9']):
+			if c1.is_atout() or c2.is_atout():
+				self.type='c69' # on verifiera plus tard si le c69 est bien joué sur quelque chose
+			else:
+				self.type='69'
+			self.force=99
+			return True
+		
         return False
     
     # Les coups contenant trois cartes
