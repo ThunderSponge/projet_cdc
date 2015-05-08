@@ -47,9 +47,9 @@ def permutations(lettres):
 
     for t in lettres:
         n.append(lettres.count(t))
-    
+
     trav=lettres
-    
+
     while x<=len(lettres)-2: #nbre de lettres du mot
         sol=[]
         for i in range(0,len(lettres),1):
@@ -60,17 +60,17 @@ def permutations(lettres):
                     sol.append(li+lettres[i])
         trav=list(set(sol))
         x+=1
-        
+
     ret=[]
     for l in sol:
         ret.append(wrap(l,1))
     return ret
 
-    
+
 def seSuivent(liste):
     ####
     # Fonction qui determine si les valeurs de carte se suivent
-	# /!!\ Attention, pour le moment ordre strict du 3 -> 4 ... -> As -> 2, pas de boucles
+  # /!!\ Attention, pour le moment ordre strict du 3 -> 4 ... -> As -> 2, pas de boucles
     ####
     nl=[]
     for c in liste:
@@ -92,12 +92,12 @@ class Regles:
 
 
 class Coup:
-    
+
     def __init__(self,cartes):
         self.cartes=cartes # Les cartes qui composent le coup #liste
         self.force=0       # La force du coup
-        self.type=''       # Le type de coup 
-        
+        self.type=''       # Le type de coup
+
     def estValide(self,pile):
         #########################################################################
         # Determine si un coup est un coup valide
@@ -121,16 +121,16 @@ class Coup:
             return False
         if not self.estPlusFort(pile):
             return False
-        
+
         if (self.cartes[0].get_valeur() != 'VENDU'):
             pile.set_tour_en_cours(self)
         return True
-    
+
     def estUnCoup(self):
         # Verifie que les cartes forment bien une combinaison autorisée
         # On va supposer que les cartes ont été jouées dans l'ordre pour former un coup
         # Parce que sinon c'est pénible [voir pour une version x.0 où on fera comme on veut]
-        
+
         # Dans cette fonction on determine également la force d'un coup
         # C'est un peu fat mama fonction quoi
 
@@ -147,43 +147,43 @@ class Coup:
             return self.coupTriple()
         elif (len(self.cartes)==4):
             return self.coupQuadruple()
-		elif (len(self.cartes)==7):
-			return self.coupSeptuple()
- 
+        elif (len(self.cartes)==7):
+            return self.coupSeptuple()
+
         print("Ce coup n'existe pas ou n'est pas encore implemente")
-        
+
         return False
-    
+
     def estCorrect(self,pile):
         # Verifie que le coup est compatible avec ce qui est au centre
         if self.type=='VENDU':
             return True
         if pile.get_tour_en_cours()=='' or self.type in recouvrement[pile.get_type_tour_en_cours()]:
             return True
-        
+
         print("On ne peux pas jouer un {} sur un {}".format(self.type,pile.get_type_tour_en_cours()))
         return False
-    
+
     def estPlusFort(self,pile):
         # Verifie que le coup est plus fort que ce qui est au centre
         if self.type=='VENDU':
             return True
         if pile.get_tour_en_cours()=='' or self.force >= pile.get_force_tour_en_cours():
             return True
-        
+
         print("Votre coup (force: {}) est trop faible par rapport à celui sur la pile (force: {})".format(self.force,pile.get_force_tour_en_cours()))
         return False
-    
-    
+
+
 ########################################################################################################################################################
 #
-#   
+#
     ###########################################################################
     #
     # Determination du type et de la force d'un coup reparti par nombre de carte dans le coup
     #
     ###########################################################################
-    
+
     # Les coups contenant une seule carte
     def coupMono(self):
         if (self.cartes[0].get_valeur() == 'VENDU'):
@@ -204,13 +204,13 @@ class Coup:
                 self.force=self.cartes[0].get_real_valeur()
             return True
         return False
-    
+
     # Les coups contenant deux cartes
     def coupDouble(self):
-        
+
         c1=self.cartes[0]
         c2=self.cartes[1]
-        
+
         # Le cul de chouette
         if c1.is_bout():
             if c2.is_bout():
@@ -223,7 +223,7 @@ class Coup:
                 return True
             # Tout autre coup contenant un bout est forcement incorrect
             return False
-        
+
         if c1.is_normale():
             if c2.is_normale():
                 # Double
@@ -232,7 +232,7 @@ class Coup:
                     self.type='ndouble'
                     self.force=c1.get_real_valeur()
                     return True
-        
+
         if c1.is_atout(): # Normalement c'est le cas hein, mais bon....
             if c2.is_atout():
                 if seSuivent(self.cartes):
@@ -245,27 +245,27 @@ class Coup:
                     self.type='49'
                     self.force=99
                     return True
-					
-		# Coup du pervers
-		if [c1.get_valeur(),c2.get_valeur()] in permutation(['6','9']):
-			if c1.is_atout() or c2.is_atout():
-				self.type='c69' # on verifiera plus tard si le c69 est bien joué sur quelque chose
-			else:
-				self.type='69'
-			self.force=99
-			return True
-		
-        return False
+
+    # Coup du pervers
+        if [c1.get_valeur(),c2.get_valeur()] in permutation(['6','9']):
+            if c1.is_atout() or c2.is_atout():
+                self.type='c69' # on verifiera plus tard si le c69 est bien joué sur quelque chose
+            else:
+                self.type='69'
+            self.force=99
+            return True
     
+        return False
+
     # Les coups contenant trois cartes
     def coupTriple(self):
         c1=self.cartes[0]
         c2=self.cartes[1]
         c3=self.cartes[2]
-        
+
         if c1.is_bout() or c2.is_bout() or c3.is_bout():
             return False
-        
+
         if c1.is_normale() and c2.is_normale() and c3.is_normale():
             if c1.get_real_valeur() == c2.get_real_valeur() and c1.get_real_valeur() == c3.get_real_valeur():
                 self.type='ntriple'
@@ -276,44 +276,44 @@ class Coup:
                 self.type='atriple'
                 self.force=max(c1.get_real_valeur(),c2.get_real_valeur(),c3.get_real_valeur())
                 return True
-            
+
         return False
-    
+
     # Les coups contenant quatre cartes
     def coupQuadruple(self):
         c1=self.cartes[0]
         c2=self.cartes[1]
         c3=self.cartes[2]
         c4=self.cartes[3]
-        
+
         if c1.is_normale() and c2.is_normale() and c3.is_normale() and c4.is_normale():
             if c1.get_real_valeur() == c2.get_real_valeur() and c1.get_real_valeur() == c3.get_real_valeur() and c1.get_real_valeur() == c4.get_real_valeur():
                 self.type='nquad'
                 self.force=c1.get_real_valeur()
                 return True
-            
+
         return False
-	
-	def coupQuintuple(self):
+
+    def coupQuintuple(self):
         c1=self.cartes[0]
         c2=self.cartes[1]
         c3=self.cartes[2]
         c4=self.cartes[3]
         c5=self.cartes[4]
-		return False
-	
-	def coupSextuple(self):
+        return False
+
+    def coupSextuple(self):
         c1=self.cartes[0]
         c2=self.cartes[1]
         c3=self.cartes[2]
         c4=self.cartes[3]
         c5=self.cartes[4]
         c6=self.cartes[5]
-		return False
-	
-	# Les coups spéciaux à sept cartes
-	def coupSeptuple(self):
-		# Le passe sirop
+        return False
+
+  # Les coups spéciaux à sept cartes
+    def coupSeptuple(self):
+    # Le passe sirop
         c1=self.cartes[0]
         c2=self.cartes[1]
         c3=self.cartes[2]
@@ -321,37 +321,37 @@ class Coup:
         c5=self.cartes[4]
         c6=self.cartes[5]
         c7=self.cartes[6]
-		
-		psirop=True
-		for c in c1,c2,c3,c4,c5,c6,c7:
-			psirop=psirop and c.is_normale()
-		if psirop and seSuivent([c1,c2,c3,c4,c5,c6,c7]):
-			self.type='passesirop'
-			self.force=99
-			for c in c1,c2,c3,c4,c5,c6,c7:
-				self.force=min(self.force,c.get_real_valeur()) # point de regle: la force d'un passe sirop est celle de sa plus petite carte
-			return True
-		
-		# Reste à verifier 
-		
-		return False
 
-#   
-#    
+        psirop=True
+        for c in c1,c2,c3,c4,c5,c6,c7:
+            psirop=psirop and c.is_normale()
+        if psirop and seSuivent([c1,c2,c3,c4,c5,c6,c7]):
+            self.type='passesirop'
+            self.force=99
+            for c in c1,c2,c3,c4,c5,c6,c7:
+                self.force=min(self.force,c.get_real_valeur()) # point de regle: la force d'un passe sirop est celle de sa plus petite carte
+            return True
+    
+        # Reste à verifier
+    
+        return False
+
+#
+#
 ########################################################################################################################################################
-    
-    
+
+
     ###########################################################################
     #
     # Accesseurs et divers
     #
     ###########################################################################
-    
+
     def get_force(self):
         return self.force
-    
+
     def get_type(self):
         return self.type
-    
+
     def __str__(self):
         return 'Coup Coup'
